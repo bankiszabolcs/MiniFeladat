@@ -110,18 +110,16 @@ namespace MiniFeladat
 
     public partial class Default : System.Web.UI.Page
     {
+        protected List<Product> ProductList { get; set; }
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)
             {
-                // Initialize ProductService
                 ProductService productService = new ProductService();
 
-                // Fill ProductService with data
                 productService.FillWithData();
 
-                // Retrieve list of products
-                List<Product> productList = productService.GetAll();
+                ProductList = productService.GetAll();
             }
         }
     }

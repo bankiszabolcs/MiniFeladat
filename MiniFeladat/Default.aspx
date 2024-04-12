@@ -4,39 +4,36 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
-    <title></title>
+    <title>Mini feladat</title>
+    <link href="Content/bootstrap.min.css" rel="stylesheet" />
+    <script src="Scripts/bootstrap.min.js"></script>
 </head>
 <body>
     <form id="form1" runat="server">
         <div>
             <table class="table">
   <thead>
-    <tr>
-      <th scope="col">#</th>
-      <th scope="col">First</th>
-      <th scope="col">Last</th>
-      <th scope="col">Handle</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th scope="row">1</th>
-      <td>Mark</td>
-      <td>Otto</td>
-      <td>@mdo</td>
-    </tr>
-    <tr>
-      <th scope="row">2</th>
-      <td>Jacob</td>
-      <td>Thornton</td>
-      <td>@fat</td>
-    </tr>
-    <tr>
-      <th scope="row">3</th>
-      <td colspan="2">Larry the Bird</td>
-      <td>@twitter</td>
-    </tr>
-  </tbody>
+                    <tr>
+                        <th scope="col">Product ID</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Price</th>
+                        <th scope="col">Stock Quantity</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">Category</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% foreach (var product in ProductList) { %>
+                        <tr>
+                            <td><%: product.ProductId %></td>
+                            <td><%: product.Name %></td>
+                            <td><%: product.Price %></td>
+                            <td><%: product.StockQuantity %></td>
+                            <td><%: product.Description %></td>
+                            <td><%: product.Category %></td>
+                        </tr>
+                    <% } %>
+                </tbody>
 </table>
         </div>
     </form>
