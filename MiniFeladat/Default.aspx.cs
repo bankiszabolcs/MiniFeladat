@@ -26,13 +26,13 @@ namespace MiniFeladat
         private static int lastProductId = 0;
         public int ProductId { get; private set; }
         public string Name { get; set; }
-        public decimal Price { get; set; }
+        public float Price { get; set; }
         public int StockQuantity { get; set; }
         public string Description { get; set; }
         public bool IsAvailable { get; set; }
         public string Category { get; set; }
 
-        public Product(string name, decimal price, int stockQuantity, string description, string category, bool isAvailable)
+        public Product(string name, float price, int stockQuantity, string description, string category, bool isAvailable)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
@@ -65,7 +65,7 @@ namespace MiniFeladat
         }
 
 
-        public Product(int id, string name, decimal price, int stockQuantity, string description, string category, bool isAvailable)
+        public Product(int id, string name, float price, int stockQuantity, string description, string category, bool isAvailable)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
@@ -179,9 +179,9 @@ namespace MiniFeladat
 
                 Categories = categoryService.GetAll();
 
-                productService.Add(new Product("Laptop", 198899m, 10, "Erőteljes laptop játékhoz és produktivitáshoz", Categories[1].Name, true));
-                productService.Add(new Product("Póló", 4999.99m, 50, "Kényelmes pamut póló mindennapos viselethez", Categories[2].Name, true));
-                productService.Add(new Product("Kávéfőző", 99990.99m, 20, "Automatikus kávéfőző finom kávékészítéshez", Categories[0].Name, false));
+                productService.Add(new Product("Laptop", 198899f, 10, "Erőteljes laptop játékhoz és produktivitáshoz", Categories[1].Name, true));
+                productService.Add(new Product("Póló", 4999.99f, 50, "Kényelmes pamut póló mindennapos viselethez", Categories[2].Name, true));
+                productService.Add(new Product("Kávéfőző", 99990.99f, 20, "Automatikus kávéfőző finom kávékészítéshez", Categories[0].Name, false));
 
                 ProductList = productService.GetAll();
             }
@@ -197,9 +197,17 @@ namespace MiniFeladat
         [WebMethod]
         public static Product UpdateProduct(int id, string name, float price, int stockQuantity, string description, string category, bool isAvailable )
         {
-            Product updatedProduct = new Product(id, name, Convert.ToDecimal(price), stockQuantity, description, category, isAvailable);
+            Product updatedProduct = new Product(id, name, price, stockQuantity, description, category, isAvailable);
             productService.Update(updatedProduct);
             return updatedProduct;
+        }
+
+        [WebMethod]
+        public static Product AddProduct(string name, float price, int stockQuantity, string description, string category, bool isAvailable)
+        {
+            Product newProduct = new Product(name, price, stockQuantity, description, category, isAvailable);
+            productService.Add(newProduct);
+            return newProduct;
         }
 
     }

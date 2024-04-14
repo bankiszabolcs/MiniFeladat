@@ -68,7 +68,11 @@
                                 <th class="text-center" scope="col">Leírás</th>
                                 <th class="text-center" scope="col">Kategória</th>
                                 <th class="text-center" scope="col">Elérhető</th>
-                                <th class="text-center" scope="col"></th>
+                                <th class="text-center" scope="col">
+                                    <button type="button" class="btn btn-success" style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: 2rem; --bs-btn-font-size: .75rem;" data-bs-toggle="modal" data-bs-target="#editModal" onclick="showEditModal()">
+                                        <i class="fa fa-plus"></i>
+                                    </button>
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
@@ -77,7 +81,7 @@
                             <tr id="productRow_<%: product.ProductId %>">
                                 <td class="text-center align-middle"><%: product.ProductId %></td>
                                 <td class="text-center align-middle"><%: product.Name %></td>
-                                <td class="text-center align-middle"><%: product.Price %></td>
+                                <td class="text-center align-middle"><%: product.Price.ToString().Replace(",",".") %></td>
                                 <td class="text-center align-middle"><%: product.StockQuantity %></td>
                                 <td class="text-center align-middle"><%: product.Description %></td>
                                 <td class="text-center align-middle"><%: product.Category %></td>
@@ -91,7 +95,7 @@
                                     <% } %></td>
                                 <td class="align-middle">
                                     <div class="d-flex justify-content-center column-gap-2">
-                                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editModal" onclick="showEditModal(<%: product.ProductId %>, '<%: product.Name %>', <%:product.Price %>, <%:product.StockQuantity %>, '<%:product.Description %>', '<%:product.Category %>', <%: (product.IsAvailable ? "true" : "false") %>)">
+                                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editModal" onclick="showEditModal(<%: product.ProductId %>, '<%: product.Name %>', '<%:product.Price.ToString().Replace(",",".") %>', <%:product.StockQuantity %>, '<%:product.Description %>', '<%:product.Category %>', <%: (product.IsAvailable ? "true" : "false") %>)">
                                             <i class="fa fa-edit"></i>
                                         </button>
                                         <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#deleteModal" onclick="showDeleteModal('<%: product.ProductId %>', '<%: product.Name %>')">
@@ -198,7 +202,7 @@
                 console.error(error.get_message());
             }
 
-            function showEditModal(id, name, price, stockQuantity, description, category, isAvailable) {
+            function showEditModal(id=0, name="", price=0, stockQuantity=0, description = "", category = "", isAvailable = false) {
 
                 document.getElementById('<%= hfProductId.ClientID %>').value = id;
 
@@ -215,17 +219,28 @@
                 const productId = document.getElementById('<%= hfProductId.ClientID %>').value;
                 const name = document.getElementById('editProductName').value;
                 const priceString = document.getElementById('editProductPrice').value;
-                const price = parseFloat(priceString).toPrecision(2); 
-
+                const price = parseFloat(priceString).toFixed(2); 
                 const stockQuantity = document.getElementById('editProductStockQuantity').value;
                 const description = document.getElementById('editProductDescription').value;
                 const category = document.getElementById('editProductCategory').value;
                 const isAvailable = document.getElementById('editIsAvailable').checked;
-                PageMethods.UpdateProduct(productId, name, price, stockQuantity, description, category, isAvailable, onUpdateSuccess, onUpdateFailure);
+
+                if (productId == 0) {
+                    PageMethods.AddProduct(name, price, stockQuantity, description, category, isAvailable, onUpdateSuccess, onUpdateFailure);
+                } else {
+                    PageMethods.UpdateProduct(productId, name, price, stockQuantity, description, category, isAvailable, onUpdateSuccess, onUpdateFailure);
+                }
             }
 
             function onUpdateSuccess(product) {
                 var row = document.getElementById('productRow_' + product.ProductId);
+                if (!row) {
+                    var tr = document.createElement("tr");
+                    tr.id = "productRow_" + product.ProductId;
+                    var tbody = document.querySelector("tbody"); 
+                    tbody.appendChild(tr);
+                    row = tr
+                }
                 row.innerHTML = "";
                 row.innerHTML = `
             <td class="text-center align-middle">${product.ProductId}</td>
