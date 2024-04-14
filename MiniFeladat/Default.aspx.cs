@@ -152,7 +152,7 @@ namespace MiniFeladat
             int index = products.FindIndex(p => p.ProductId == updatedProduct.ProductId);
             if (index != -1)
             {
-                if (!products.Any(p => p.Name.ToLower().Trim() == updatedProduct.Name.ToLower().Trim()))
+                if (products.Where(p => p.Name.ToLower().Trim() == updatedProduct.Name.ToLower().Trim()).ToList().Count <= 1)
                 {
                     products[index] = updatedProduct;
                 }

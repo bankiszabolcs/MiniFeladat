@@ -20,37 +20,38 @@
         <asp:HiddenField ID="hfProductCategory" runat="server" />
         <nav class="navbar navbar-expand-lg bg-body-tertiary">
             <div class="container-fluid">
-                <a class="navbar-brand" href="#">Navbar</a>
+                <a class="navbar-brand" href="#">MiniFeladat</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="#">Home</a>
+                            <a class="nav-link active" aria-current="page" href="#">Főoldal
+                            </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">Link</a>
+                            <a class="nav-link" href="#">Termékek</a>
                         </li>
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Dropdown
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Kapcsolat
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="#">Action</a></li>
-                                <li><a class="dropdown-item" href="#">Another action</a></li>
+                                <li><a class="dropdown-item" href="#">Kapcsolat 1</a></li>
+                                <li><a class="dropdown-item" href="#">Kapcsolat 2</a></li>
                                 <li>
                                     <hr class="dropdown-divider">
                                 </li>
-                                <li><a class="dropdown-item" href="#">Something else here</a></li>
+                                <li><a class="dropdown-item" href="#">GYIK</a></li>
                             </ul>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link disabled" aria-disabled="true">Disabled</a>
+                            <a class="nav-link disabled" aria-disabled="true">Házhozszállítás</a>
                         </li>
                     </ul>
                     <form class="d-flex" role="search">
-                        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                        <button class="btn btn-outline-success" type="submit">Search</button>
+                        <input class="form-control me-2" type="search" placeholder="Keresés a termékeink között" aria-label="Search">
+                        <button class="btn btn-outline-success" type="submit">Keresés</button>
                     </form>
                 </div>
             </div>
@@ -81,8 +82,8 @@
                             <tr id="productRow_<%: product.ProductId %>">
                                 <td class="text-center align-middle"><%: product.ProductId %></td>
                                 <td class="text-center align-middle"><%: product.Name %></td>
-                                <td class="text-center align-middle"><%: product.Price.ToString().Replace(",",".") %></td>
-                                <td class="text-center align-middle"><%: product.StockQuantity %></td>
+                                <td class="text-center align-middle"><%: product.Price.ToString().Replace(",",".") %> Ft</td>
+                                <td class="text-center align-middle"><%: product.StockQuantity %> db</td>
                                 <td class="text-center align-middle"><%: product.Description %></td>
                                 <td class="text-center align-middle"><%: product.Category %></td>
                                 <td class="text-center text-muted align-middle"><% if (product.IsAvailable)
@@ -141,27 +142,41 @@
                             <div class="mb-3">
                                 <label for="editProductName" class="form-label">Név:</label>
                                 <input type="text" class="form-control" id="editProductName" />
+                                <div class="invalid-feedback">
+                                    Termék nevének legalább 3 katakterből kell állnia
+                                 </div>
                             </div>
                             <div class="mb-3">
                                 <label for="editProductPrice" class="form-label">Ár:</label>
                                 <input type="number" class="form-control" id="editProductPrice" />
+                                <div class="invalid-feedback" >
+                                    Az ár nem lehet negatív!
+                                </div>
                             </div>
                             <div class="mb-3">
                                 <label for="editProductStockQuantity" class="form-label">Mennyiség:</label>
                                 <input type="number" class="form-control" id="editProductStockQuantity" />
+                                <div class="invalid-feedback">
+                                    A raktármennyiség nem lehet negatív!
+                                </div>
                             </div>
                             <div class="mb-3">
                                 <label for="editProductDescription" class="form-label">Leírás:</label>
                                 <textarea class="form-control" id="editProductDescription"></textarea>
+                                <div class="invalid-feedback" >
+                                    A raktármennyiség nem lehet negatív.
+                                </div>
                             </div>
                             <div class="mb-3">
                                 <label for="editProductCategory" class="form-label">Kategória:</label>
                                 <select class="form-select" id="editProductCategory">
+                                    <option disabled selected>-Kategóriák-</option>
                                     <% foreach (var category in Categories)
                                         { %>
                                     <option value="<%= category.Name %>"><%= category.Name %></option>
                                     <% } %>
                                 </select>
+                                <div class="invalid-feedback">Válassz kategóriát!</div>
                             </div>
                             <div class="mb-3 form-check">
                                 <input type="checkbox" class="form-check-input" id="editIsAvailable"/>
@@ -210,7 +225,14 @@
                 document.getElementById('editProductPrice').value = price;
                 document.getElementById('editProductStockQuantity').value = stockQuantity;
                 document.getElementById('editProductDescription').value = description;
-                document.getElementById('editProductCategory').value = category;
+
+                var categorySelect = document.getElementById('editProductCategory');
+                if (category === "") {
+                    categorySelect.value = "-Kategóriák-";
+                } else {
+                    categorySelect.value = category;
+                }
+
                 document.getElementById('editIsAvailable').checked = isAvailable;
             }
 
@@ -250,8 +272,8 @@
                 row.innerHTML = `
             <td class="text-center align-middle">${product.ProductId}</td>
             <td class="text-center align-middle">${product.Name}</td>
-            <td class="text-center align-middle">${product.Price}</td>
-            <td class="text-center align-middle">${product.StockQuantity}</td>
+            <td class="text-center align-middle">${product.Price} Ft</td>
+            <td class="text-center align-middle">${product.StockQuantity} db</td>
             <td class="text-center align-middle">${product.Description}</td>
             <td class="text-center align-middle">${product.Category}</td>
              <td class="text-center text-muted align-middle">${product.IsAvailable ? '<i class="fa fa-check"></i>'
@@ -272,6 +294,64 @@
             function onUpdateFailure(error) {
                 console.error(error.get_message());
             }
+
+            const checkNegativeOrNot = function () {
+                var inputField = this.value;
+                var min = 0;
+
+                if (inputField.length === 0) {
+                    this.classList.add('is-invalid');
+                    this.nextElementSibling.innerText = "Mező nem lehet üres";
+                }
+                else if (inputField < min) {
+                    this.classList.add('is-invalid');
+                    this.nextElementSibling.innerText = "Az érték nem lehet negatív!";
+                } else {
+                    this.classList.remove('is-invalid');
+                }
+            }
+
+            const checkTheName = function () {
+                const inputField = this.value;
+                const min = 3;
+
+                if (inputField.length === 0) {
+                    this.classList.add('is-invalid');
+                    this.nextElementSibling.innerText = "Mező nem lehet üres";
+                }
+                else if (inputField.length < min) {
+                    this.classList.add('is-invalid');
+                    this.nextElementSibling.innerText = "Névnek legalább 3 karakterből kell állnia";
+                } else {
+                    this.classList.remove('is-invalid');
+                }
+            }
+
+            const checkTheDescription = function () {
+                var inputField = this.value;
+                var min = 0;
+
+                if (inputField.length === 0) {
+                    this.classList.add('is-invalid');
+                    this.nextElementSibling.innerText = "Mező nem lehet üres";
+                } else {
+                    this.classList.remove('is-invalid');
+                }
+            }
+
+            const checkTheCategory = function (e) {
+                if (e.target.value === "-Kategóriák-") {
+                    this.classList.add('is-invalid');
+                } else {
+                    this.classList.remove('is-invalid');
+                }
+            }
+
+            document.querySelector('#editProductPrice').addEventListener('input', checkNegativeOrNot)
+            document.querySelector('#editProductStockQuantity').addEventListener('input', checkNegativeOrNot)
+            document.querySelector('#editProductName').addEventListener('input', checkTheName)
+            document.querySelector('#editProductDescription').addEventListener('input', checkTheDescription)
+            document.querySelector('#editProductCategory').addEventListener('click', checkTheCategory)
 
         </script>
     </form>
