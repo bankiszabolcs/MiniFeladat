@@ -127,7 +127,14 @@ namespace MiniFeladat
 
         public void Add(Product product)
         {
-            products.Add(product);
+            if (!products.Any(p => p.Name.ToLower().Trim() == product.Name.ToLower().Trim())) 
+            {
+                products.Add(product);
+            }
+            else
+            {
+                throw new ArgumentException("Ilyen névvel már található termék!");
+            }
         }
 
         public List<Product> GetAll()
@@ -145,7 +152,14 @@ namespace MiniFeladat
             int index = products.FindIndex(p => p.ProductId == updatedProduct.ProductId);
             if (index != -1)
             {
-                products[index] = updatedProduct;
+                if (!products.Any(p => p.Name.ToLower().Trim() == updatedProduct.Name.ToLower().Trim()))
+                {
+                    products[index] = updatedProduct;
+                }
+                else
+                {
+                    throw new ArgumentException("Ilyen névvel már található termék!");
+                }
             }
             else
             {
@@ -195,7 +209,7 @@ namespace MiniFeladat
         }
 
         [WebMethod]
-        public static Product UpdateProduct(int id, string name, float price, int stockQuantity, string description, string category, bool isAvailable )
+        public static Product UpdateProduct(int id, string name, float price, int stockQuantity, string description, string category, bool isAvailable)
         {
             Product updatedProduct = new Product(id, name, price, stockQuantity, description, category, isAvailable);
             productService.Update(updatedProduct);

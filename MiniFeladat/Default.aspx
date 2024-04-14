@@ -144,11 +144,11 @@
                             </div>
                             <div class="mb-3">
                                 <label for="editProductPrice" class="form-label">Ár:</label>
-                                <input type="text" class="form-control" id="editProductPrice" />
+                                <input type="number" class="form-control" id="editProductPrice" />
                             </div>
                             <div class="mb-3">
                                 <label for="editProductStockQuantity" class="form-label">Mennyiség:</label>
-                                <input type="text" class="form-control" id="editProductStockQuantity" />
+                                <input type="number" class="form-control" id="editProductStockQuantity" />
                             </div>
                             <div class="mb-3">
                                 <label for="editProductDescription" class="form-label">Leírás:</label>
@@ -225,11 +225,16 @@
                 const category = document.getElementById('editProductCategory').value;
                 const isAvailable = document.getElementById('editIsAvailable').checked;
 
-                if (productId == 0) {
-                    PageMethods.AddProduct(name, price, stockQuantity, description, category, isAvailable, onUpdateSuccess, onUpdateFailure);
-                } else {
-                    PageMethods.UpdateProduct(productId, name, price, stockQuantity, description, category, isAvailable, onUpdateSuccess, onUpdateFailure);
+                try {
+                    if (productId == 0) {
+                        PageMethods.AddProduct(name, price, stockQuantity, description, category, isAvailable, onUpdateSuccess, onUpdateFailure);
+                    } else {
+                        PageMethods.UpdateProduct(productId, name, price, stockQuantity, description, category, isAvailable, onUpdateSuccess, onUpdateFailure);
+                    }
+                } catch (e) {
+                    console.log(e)
                 }
+
             }
 
             function onUpdateSuccess(product) {
