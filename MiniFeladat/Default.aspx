@@ -13,6 +13,11 @@
     <form id="form1" runat="server">
         <asp:ScriptManager ID="ScriptManager1" runat="server" EnablePageMethods="true"></asp:ScriptManager>
         <asp:HiddenField ID="hfProductId" runat="server" />
+        <asp:HiddenField ID="hfProductName" runat="server" />
+        <asp:HiddenField ID="hfProductPrice" runat="server" />
+        <asp:HiddenField ID="hfProductStockQuantity" runat="server" />
+        <asp:HiddenField ID="hfProductDescription" runat="server" />
+        <asp:HiddenField ID="hfProductCategory" runat="server" />
         <nav class="navbar navbar-expand-lg bg-body-tertiary">
             <div class="container-fluid">
                 <a class="navbar-brand" href="#">Navbar</a>
@@ -53,7 +58,7 @@
         <div class="container mt-3">
             <div class="row">
                 <div class="col">
-                    <table class="table table-hover">
+                    <table class="table table-hover table-responsive">
                         <thead>
                             <tr>
                                 <th class="text-center" scope="col">Product ID</th>
@@ -69,15 +74,15 @@
                             <% foreach (var product in ProductList)
                                 { %>
                             <tr id="productRow_<%: product.ProductId %>">
-                                <td class="text-center"><%: product.ProductId %></td>
-                                <td class="text-center"><%: product.Name %></td>
-                                <td class="text-center"><%: product.Price %></td>
-                                <td class="text-center"><%: product.StockQuantity %></td>
-                                <td class="text-center"><%: product.Description %></td>
-                                <td class="text-center"><%: product.Category %></td>
+                                <td class="text-center align-middle"><%: product.ProductId %></td>
+                                <td class="text-center align-middle"><%: product.Name %></td>
+                                <td class="text-center align-middle"><%: product.Price %></td>
+                                <td class="text-center align-middle"><%: product.StockQuantity %></td>
+                                <td class="text-center align-middle"><%: product.Description %></td>
+                                <td class="text-center align-middle"><%: product.Category %></td>
                                 <td class="align-middle">
                                     <div class="d-flex justify-content-center column-gap-2">
-                                        <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editModal" onclick="showEditModal('<%: product.ProductId %>', '<%: product.Name %>')">
+                                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editModal" onclick="showEditModal('<%: product.ProductId %>', '<%: product.Name %>', '<%:product.Price %>', '<%:product.StockQuantity %>', '<%:product.Description %>', '<%:product.Category %>')">
                                             <i class="fa fa-edit"></i>
                                         </button>
                                         <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#deleteModal" onclick="showDeleteModal('<%: product.ProductId %>', '<%: product.Name %>')">
@@ -92,7 +97,7 @@
                 </div>
             </div>
         </div>
-        <!-- Modal for deletion confirmation -->
+
         <div id="deleteModal" class="modal fade" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -111,6 +116,52 @@
             </div>
         </div>
 
+        <!-- Edit Modal -->
+        <div id="editModal" class="modal fade" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Edit Item</h4>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="editForm">
+                            <div class="mb-3">
+                                <label for="editProductName" class="form-label">Name:</label>
+                                <input type="text" class="form-control" id="editProductName" />
+                            </div>
+                            <div class="mb-3">
+                                <label for="editProductPrice" class="form-label">Price:</label>
+                                <input type="text" class="form-control" id="editProductPrice" />
+                            </div>
+                            <div class="mb-3">
+                                <label for="editProductStockQuantity" class="form-label">Stock Quantity:</label>
+                                <input type="text" class="form-control" id="editProductStockQuantity" />
+                            </div>
+                            <div class="mb-3">
+                                <label for="editProductDescription" class="form-label">Description:</label>
+                                <textarea class="form-control" id="editProductDescription"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editProductCategory" class="form-label">Category:</label>
+                                <select class="form-select" id="editProductCategory">
+                                    <option value="Electronics">Electronics</option>
+                                    <option value="Apparel">Apparel</option>
+                                    <option value="Home">Home</option>
+                                    <option value="Clothes">Clothes</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="updateProduct()">Save Changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
         <script>
 
             function showDeleteModal(productId, productName) {
@@ -119,7 +170,6 @@
 
             }
 
-            // Function to handle deletion
             function deleteItem() {
                 const productId = document.getElementById('<%= hfProductId.ClientID %>').value;
                 PageMethods.DeleteProduct(productId, onDeleteSuccess, onDeleteFailure);
@@ -132,11 +182,59 @@
                 }
             }
 
-            // Callback function for deletion failure
             function onDeleteFailure(error) {
-                // Handle deletion failure, such as displaying an error message
                 console.error(error.get_message());
             }
+
+            function showEditModal(id, name, price, stockQuantity, description, category) {
+
+                document.getElementById('<%= hfProductId.ClientID %>').value = id;
+
+                document.getElementById('editProductName').value = name;
+                document.getElementById('editProductPrice').value = price;
+                document.getElementById('editProductStockQuantity').value = stockQuantity;
+                document.getElementById('editProductDescription').value = description;
+                document.getElementById('editProductCategory').value = category;
+
+            }
+
+            // Function to handle updating the product
+            function updateProduct() {
+
+                document.getElementById('<%= hfProductName.ClientID %>').value = document.getElementById('editProductName').value;
+                document.getElementById('<%= hfProductPrice.ClientID %>').value = document.getElementById('editProductPrice').value;
+                document.getElementById('<%= hfProductStockQuantity.ClientID %>').value = document.getElementById('editProductStockQuantity').value;
+                document.getElementById('<%= hfProductDescription.ClientID %>').value = document.getElementById('editProductDescription').value;
+                document.getElementById('<%= hfProductCategory.ClientID %>').value = document.getElementById('editProductCategory').value;
+
+                const productId = document.getElementById('<%= hfProductId.ClientID %>').value;
+                const name = document.getElementById('<%= hfProductName.ClientID %>').value;
+                const price = document.getElementById('<%= hfProductPrice.ClientID %>').value;
+                const stockQuantity = document.getElementById('<%= hfProductStockQuantity.ClientID %>').value;
+                const description = document.getElementById('<%= hfProductDescription.ClientID %>').value;
+                const category = document.getElementById('<%= hfProductCategory.ClientID %>').value;
+                
+                PageMethods.UpdateProduct(productId, name, price, stockQuantity, description, category, onUpdateSuccess, onUpdateFailure);
+            }
+
+            // Callback function for successful product update
+            function onUpdateSuccess(productId) {
+                var row = document.getElementById('productRow_' + productId);
+                if (row) {
+                    row.cells[1].innerText = document.getElementById('<%= hfProductName.ClientID %>').value;
+                    row.cells[2].innerText = document.getElementById('<%= hfProductPrice.ClientID %>').value;
+                    row.cells[3].innerText = document.getElementById('<%= hfProductStockQuantity.ClientID %>').value;
+                    row.cells[4].innerText = document.getElementById('<%= hfProductDescription.ClientID %>').value;
+                    row.cells[5].innerText = document.getElementById('<%= hfProductCategory.ClientID %>').value;
+                };
+            }
+
+            // Callback function for product update failure
+            function onUpdateFailure(error) {
+                // Handle update failure, such as displaying an error message
+                console.error(error.get_message());
+            }
+
         </script>
     </form>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
