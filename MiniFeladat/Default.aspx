@@ -61,13 +61,14 @@
                     <table class="table table-hover table-responsive">
                         <thead>
                             <tr>
-                                <th class="text-center" scope="col">Product ID</th>
-                                <th class="text-center" scope="col">Name</th>
-                                <th class="text-center" scope="col">Price</th>
-                                <th class="text-center" scope="col">Stock Quantity</th>
-                                <th class="text-center" scope="col">Description</th>
-                                <th class="text-center" scope="col">Category</th>
-                                <th class="text-center" scope="col">Actions</th>
+                                <th class="text-center" scope="col">Termék ID</th>
+                                <th class="text-center" scope="col">Név</th>
+                                <th class="text-center" scope="col">Ár</th>
+                                <th class="text-center" scope="col">Mennyiség</th>
+                                <th class="text-center" scope="col">Leírás</th>
+                                <th class="text-center" scope="col">Kategória</th>
+                                <th class="text-center" scope="col">Elérhető</th>
+                                <th class="text-center" scope="col"></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -80,9 +81,17 @@
                                 <td class="text-center align-middle"><%: product.StockQuantity %></td>
                                 <td class="text-center align-middle"><%: product.Description %></td>
                                 <td class="text-center align-middle"><%: product.Category %></td>
+                                <td class="text-center text-muted align-middle"><% if (product.IsAvailable)
+                                                                                    { %>
+                                    <i class="fa fa-check"></i>
+                                    <% }
+                                        else
+                                        { %>
+                                    <i class="fa fa-times"></i>
+                                    <% } %></td>
                                 <td class="align-middle">
                                     <div class="d-flex justify-content-center column-gap-2">
-                                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editModal" onclick="showEditModal('<%: product.ProductId %>', '<%: product.Name %>', '<%:product.Price %>', '<%:product.StockQuantity %>', '<%:product.Description %>', '<%:product.Category %>')">
+                                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editModal" onclick="showEditModal(<%: product.ProductId %>, '<%: product.Name %>', <%:product.Price %>, <%:product.StockQuantity %>, '<%:product.Description %>', '<%:product.Category %>', <%: (product.IsAvailable ? "true" : "false") %>)">
                                             <i class="fa fa-edit"></i>
                                         </button>
                                         <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#deleteModal" onclick="showDeleteModal('<%: product.ProductId %>', '<%: product.Name %>')">
@@ -106,7 +115,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        Are you sure you want to delete this item?
+                        Biztosan törlöd ezt az elemet??
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Mégsem</button>
@@ -116,40 +125,43 @@
             </div>
         </div>
 
-        <!-- Edit Modal -->
         <div id="editModal" class="modal fade" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h4 class="modal-title">Edit Item</h4>
+                        <h4 class="modal-title">Termék szerkesztése</h4>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <div id="editForm">
                             <div class="mb-3">
-                                <label for="editProductName" class="form-label">Name:</label>
+                                <label for="editProductName" class="form-label">Név:</label>
                                 <input type="text" class="form-control" id="editProductName" />
                             </div>
                             <div class="mb-3">
-                                <label for="editProductPrice" class="form-label">Price:</label>
+                                <label for="editProductPrice" class="form-label">Ár:</label>
                                 <input type="text" class="form-control" id="editProductPrice" />
                             </div>
                             <div class="mb-3">
-                                <label for="editProductStockQuantity" class="form-label">Stock Quantity:</label>
+                                <label for="editProductStockQuantity" class="form-label">Mennyiség:</label>
                                 <input type="text" class="form-control" id="editProductStockQuantity" />
                             </div>
                             <div class="mb-3">
-                                <label for="editProductDescription" class="form-label">Description:</label>
+                                <label for="editProductDescription" class="form-label">Leírás:</label>
                                 <textarea class="form-control" id="editProductDescription"></textarea>
                             </div>
                             <div class="mb-3">
-                                <label for="editProductCategory" class="form-label">Category:</label>
+                                <label for="editProductCategory" class="form-label">Kategória:</label>
                                 <select class="form-select" id="editProductCategory">
-                                    <option value="Electronics">Electronics</option>
-                                    <option value="Apparel">Apparel</option>
-                                    <option value="Home">Home</option>
-                                    <option value="Clothes">Clothes</option>
+                                    <% foreach (var category in Categories)
+                                        { %>
+                                    <option value="<%= category.Name %>"><%= category.Name %></option>
+                                    <% } %>
                                 </select>
+                            </div>
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" class="form-check-input" id="editIsAvailable"/>
+                                <label class="form-check-label" for="editIsAvailable" >Raktáron</label>
                             </div>
                         </div>
                     </div>
@@ -186,7 +198,7 @@
                 console.error(error.get_message());
             }
 
-            function showEditModal(id, name, price, stockQuantity, description, category) {
+            function showEditModal(id, name, price, stockQuantity, description, category, isAvailable) {
 
                 document.getElementById('<%= hfProductId.ClientID %>').value = id;
 
@@ -195,43 +207,49 @@
                 document.getElementById('editProductStockQuantity').value = stockQuantity;
                 document.getElementById('editProductDescription').value = description;
                 document.getElementById('editProductCategory').value = category;
-
+                document.getElementById('editIsAvailable').checked = isAvailable;
             }
 
-            // Function to handle updating the product
             function updateProduct() {
 
-                document.getElementById('<%= hfProductName.ClientID %>').value = document.getElementById('editProductName').value;
-                document.getElementById('<%= hfProductPrice.ClientID %>').value = document.getElementById('editProductPrice').value;
-                document.getElementById('<%= hfProductStockQuantity.ClientID %>').value = document.getElementById('editProductStockQuantity').value;
-                document.getElementById('<%= hfProductDescription.ClientID %>').value = document.getElementById('editProductDescription').value;
-                document.getElementById('<%= hfProductCategory.ClientID %>').value = document.getElementById('editProductCategory').value;
-
                 const productId = document.getElementById('<%= hfProductId.ClientID %>').value;
-                const name = document.getElementById('<%= hfProductName.ClientID %>').value;
-                const price = document.getElementById('<%= hfProductPrice.ClientID %>').value;
-                const stockQuantity = document.getElementById('<%= hfProductStockQuantity.ClientID %>').value;
-                const description = document.getElementById('<%= hfProductDescription.ClientID %>').value;
-                const category = document.getElementById('<%= hfProductCategory.ClientID %>').value;
-                
-                PageMethods.UpdateProduct(productId, name, price, stockQuantity, description, category, onUpdateSuccess, onUpdateFailure);
+                const name = document.getElementById('editProductName').value;
+                const priceString = document.getElementById('editProductPrice').value;
+                const price = parseFloat(priceString).toPrecision(2); 
+
+                const stockQuantity = document.getElementById('editProductStockQuantity').value;
+                const description = document.getElementById('editProductDescription').value;
+                const category = document.getElementById('editProductCategory').value;
+                const isAvailable = document.getElementById('editIsAvailable').checked;
+                PageMethods.UpdateProduct(productId, name, price, stockQuantity, description, category, isAvailable, onUpdateSuccess, onUpdateFailure);
             }
 
-            // Callback function for successful product update
-            function onUpdateSuccess(productId) {
-                var row = document.getElementById('productRow_' + productId);
-                if (row) {
-                    row.cells[1].innerText = document.getElementById('<%= hfProductName.ClientID %>').value;
-                    row.cells[2].innerText = document.getElementById('<%= hfProductPrice.ClientID %>').value;
-                    row.cells[3].innerText = document.getElementById('<%= hfProductStockQuantity.ClientID %>').value;
-                    row.cells[4].innerText = document.getElementById('<%= hfProductDescription.ClientID %>').value;
-                    row.cells[5].innerText = document.getElementById('<%= hfProductCategory.ClientID %>').value;
-                };
+            function onUpdateSuccess(product) {
+                var row = document.getElementById('productRow_' + product.ProductId);
+                row.innerHTML = "";
+                row.innerHTML = `
+            <td class="text-center align-middle">${product.ProductId}</td>
+            <td class="text-center align-middle">${product.Name}</td>
+            <td class="text-center align-middle">${product.Price}</td>
+            <td class="text-center align-middle">${product.StockQuantity}</td>
+            <td class="text-center align-middle">${product.Description}</td>
+            <td class="text-center align-middle">${product.Category}</td>
+             <td class="text-center text-muted align-middle">${product.IsAvailable ? '<i class="fa fa-check"></i>'
+                        :
+                        '<i class="fa fa-times"></i>'}</td>
+            <td class="align-middle">
+                <div class="d-flex justify-content-center column-gap-2">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editModal" onclick="showEditModal(${product.ProductId}, '${product.Name}', ${product.Price}, ${product.StockQuantity}, '${product.Description}', '${product.Category}', ${(product.IsAvailable ? "true" : "false")})">
+                        <i class="fa fa-edit"></i>
+                    </button>
+                    <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#deleteModal" onclick="showDeleteModal(${product.ProductId}, '${product.Name}')">
+                        <i class="fa fa-trash"></i>
+                    </button>
+                </div>
+            </td>;`
             }
 
-            // Callback function for product update failure
             function onUpdateFailure(error) {
-                // Handle update failure, such as displaying an error message
                 console.error(error.get_message());
             }
 

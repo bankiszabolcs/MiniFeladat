@@ -10,6 +10,17 @@ using System.Xml.Linq;
 
 namespace MiniFeladat
 {
+    public class ProductCategory
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+
+        public ProductCategory(int id, string name)
+        {
+            Id = id;
+            Name = name;
+        }
+    }
     public class Product
     {
         private static int lastProductId = 0;
@@ -18,10 +29,10 @@ namespace MiniFeladat
         public decimal Price { get; set; }
         public int StockQuantity { get; set; }
         public string Description { get; set; }
-        public bool IsAvalailable { get; set; }
-        public ProductCategory Category { get; set; }
+        public bool IsAvailable { get; set; }
+        public string Category { get; set; }
 
-        public Product(string name, decimal price, int stockQuantity, string description, ProductCategory category)
+        public Product(string name, decimal price, int stockQuantity, string description, string category, bool isAvailable)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
@@ -50,11 +61,11 @@ namespace MiniFeladat
             StockQuantity = stockQuantity;
             Description = description;
             Category = category;
-            IsAvalailable = true;
+            IsAvailable = isAvailable;
         }
 
 
-        public Product(int id, string name, decimal price, int stockQuantity, string description, ProductCategory category)
+        public Product(int id, string name, decimal price, int stockQuantity, string description, string category, bool isAvailable)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
@@ -82,17 +93,27 @@ namespace MiniFeladat
             StockQuantity = stockQuantity;
             Description = description;
             Category = category;
-            IsAvalailable = true;
+            IsAvailable = isAvailable;
         }
     }
 
-
-    public enum ProductCategory
+    public class ProductCategoryService
     {
-        Electronics,
-        Apparel,
-        Home,
-        Clothes
+        private List<ProductCategory> productCategories;
+
+        public ProductCategoryService()
+        {
+            productCategories = new List<ProductCategory>();
+        }
+        public List<ProductCategory> GetAll()
+        {
+            return productCategories;
+        }
+
+        public void Add(ProductCategory product)
+        {
+            productCategories.Add(product);
+        }
     }
 
     public class ProductService
@@ -116,7 +137,7 @@ namespace MiniFeladat
 
         public Product Get(int id)
         {
-            return products.Where(p => p.ProductId == id).FirstOrDefault();
+            return products.FirstOrDefault(p => p.ProductId == id);
         }
 
         public void Update(Product updatedProduct)
@@ -136,27 +157,31 @@ namespace MiniFeladat
         {
             products.RemoveAll(p => p.ProductId == productId);
         }
-
-        public void FillWithData()
-        {
-            products.Add(new Product("Laptop", 198899m, 10, "Erőteljes laptop játékhoz és produktivitáshoz", ProductCategory.Electronics));
-            products.Add(new Product("Póló", 4999.99m, 50, "Kényelmes pamut póló mindennapos viselethez", ProductCategory.Clothes));
-            products.Add(new Product("Kávéfőző", 99990.99m, 20, "Automatikus kávéfőző finom kávékészítéshez", ProductCategory.Home));
-        }
     }
 
 
     public partial class Default : System.Web.UI.Page
     {
         protected List<Product> ProductList { get; set; }
+        protected List<ProductCategory> Categories { get; set; }
         private static ProductService productService;
+        private static ProductCategoryService categoryService;
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)
             {
                 productService = new ProductService();
+                categoryService = new ProductCategoryService();
 
-                productService.FillWithData();
+                categoryService.Add(new ProductCategory(1, "Háztartás"));
+                categoryService.Add(new ProductCategory(2, "Elektronika"));
+                categoryService.Add(new ProductCategory(3, "Ruha"));
+
+                Categories = categoryService.GetAll();
+
+                productService.Add(new Product("Laptop", 198899m, 10, "Erőteljes laptop játékhoz és produktivitáshoz", Categories[1].Name, true));
+                productService.Add(new Product("Póló", 4999.99m, 50, "Kényelmes pamut póló mindennapos viselethez", Categories[2].Name, true));
+                productService.Add(new Product("Kávéfőző", 99990.99m, 20, "Automatikus kávéfőző finom kávékészítéshez", Categories[0].Name, false));
 
                 ProductList = productService.GetAll();
             }
@@ -170,11 +195,12 @@ namespace MiniFeladat
         }
 
         [WebMethod]
-        public static int UpdateProduct(int id, string name, float price, int stockQuantity, string description, ProductCategory category )
+        public static Product UpdateProduct(int id, string name, float price, int stockQuantity, string description, string category, bool isAvailable )
         {
-            Product updatedProduct = new Product(id, name, Convert.ToDecimal(price), stockQuantity, description, category);
+            Product updatedProduct = new Product(id, name, Convert.ToDecimal(price), stockQuantity, description, category, isAvailable);
             productService.Update(updatedProduct);
-            return id;
+            return updatedProduct;
         }
+
     }
 }
