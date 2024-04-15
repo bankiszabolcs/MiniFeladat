@@ -144,12 +144,12 @@
                                 <input type="text" class="form-control" id="editProductName" />
                                 <div class="invalid-feedback">
                                     Termék nevének legalább 3 katakterből kell állnia
-                                 </div>
+                                </div>
                             </div>
                             <div class="mb-3">
                                 <label for="editProductPrice" class="form-label">Ár:</label>
                                 <input type="number" class="form-control" id="editProductPrice" />
-                                <div class="invalid-feedback" >
+                                <div class="invalid-feedback">
                                     Az ár nem lehet negatív!
                                 </div>
                             </div>
@@ -163,7 +163,7 @@
                             <div class="mb-3">
                                 <label for="editProductDescription" class="form-label">Leírás:</label>
                                 <textarea class="form-control" id="editProductDescription"></textarea>
-                                <div class="invalid-feedback" >
+                                <div class="invalid-feedback">
                                     A raktármennyiség nem lehet negatív.
                                 </div>
                             </div>
@@ -179,19 +179,27 @@
                                 <div class="invalid-feedback">Válassz kategóriát!</div>
                             </div>
                             <div class="mb-3 form-check">
-                                <input type="checkbox" class="form-check-input" id="editIsAvailable"/>
-                                <label class="form-check-label" for="editIsAvailable" >Raktáron</label>
+                                <input type="checkbox" class="form-check-input" id="editIsAvailable" />
+                                <label class="form-check-label" for="editIsAvailable">Raktáron</label>
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="updateProduct()">Save Changes</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Mégse</button>
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="updateProduct()">Mentés</button>
                     </div>
                 </div>
             </div>
         </div>
 
+        <div class="toast align-items-center text-white border-0 position-absolute mb-3 bottom-0 start-50 translate-middle-x" style="" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">
+                    Termék sikeresen hozzáadva!
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
 
         <script>
 
@@ -217,7 +225,7 @@
                 console.error(error.get_message());
             }
 
-            function showEditModal(id=0, name="", price=0, stockQuantity=0, description = "", category = "", isAvailable = false) {
+            function showEditModal(id = 0, name = "", price = 0, stockQuantity = 0, description = "", category = "", isAvailable = false) {
 
                 document.getElementById('<%= hfProductId.ClientID %>').value = id;
 
@@ -241,7 +249,7 @@
                 const productId = document.getElementById('<%= hfProductId.ClientID %>').value;
                 const name = document.getElementById('editProductName').value;
                 const priceString = document.getElementById('editProductPrice').value;
-                const price = parseFloat(priceString).toFixed(2); 
+                const price = parseFloat(priceString).toFixed(2);
                 const stockQuantity = document.getElementById('editProductStockQuantity').value;
                 const description = document.getElementById('editProductDescription').value;
                 const category = document.getElementById('editProductCategory').value;
@@ -255,6 +263,7 @@
                     }
                 } catch (e) {
                     console.log(e)
+                    openToast(`Sikertelen mentés. ${e}`, "red")
                 }
 
             }
@@ -264,7 +273,7 @@
                 if (!row) {
                     var tr = document.createElement("tr");
                     tr.id = "productRow_" + product.ProductId;
-                    var tbody = document.querySelector("tbody"); 
+                    var tbody = document.querySelector("tbody");
                     tbody.appendChild(tr);
                     row = tr
                 }
@@ -289,10 +298,39 @@
                     </button>
                 </div>
             </td>;`
+
+                openToast("Sikeres mentés", "green")
+                
+
             }
 
             function onUpdateFailure(error) {
                 console.error(error.get_message());
+                openToast("Sikertelen mentés.", "red")
+            }
+
+            function openToast(text, color) {
+                
+                let toastEl = document.querySelector('.toast');
+                let toastBody = toastEl.querySelector('.toast-body')
+
+                toastBody.innerText = text;
+
+                if (color === "red") {
+                    toastEl.classList.add('bg-danger')
+                    toastEl.classList.remove('bg-success')
+                } else if (color === "green") {
+                    toastEl.classList.remove('bg-danger')
+                    toastEl.classList.add('bg-success')
+                }
+
+                let toast = new bootstrap.Toast(toastEl);
+                
+                toast.show();
+
+                setTimeout(function () {
+                    toast.hide();
+                }, 2000);
             }
 
             const checkNegativeOrNot = function () {
