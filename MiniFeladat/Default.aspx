@@ -218,11 +218,13 @@
                 var deletedRow = document.getElementById('productRow_' + productId);
                 if (deletedRow) {
                     deletedRow.remove();
+                    openToast("Sikeres törlés!", "green")
                 }
             }
 
             function onDeleteFailure(error) {
                 console.error(error.get_message());
+                openToast("Sikertelen törlés", "red")
             }
 
             function showEditModal(id = 0, name = "", price = 0, stockQuantity = 0, description = "", category = "", isAvailable = false) {
@@ -268,7 +270,12 @@
 
             }
 
-            function onUpdateSuccess(product) {
+            function onUpdateSuccess(res) {
+                if (!res.success) {
+                    openToast(res.message, "red")
+                    return 
+                }
+                let product = res.data;
                 var row = document.getElementById('productRow_' + product.ProductId);
                 if (!row) {
                     var tr = document.createElement("tr");

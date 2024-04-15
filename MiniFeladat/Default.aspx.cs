@@ -133,7 +133,7 @@ namespace MiniFeladat
             }
             else
             {
-                throw new ArgumentException("Ilyen névvel már található termék!");
+                throw new ArgumentException("Ilyen névvel már található termék!");  
             }
         }
 
@@ -209,19 +209,36 @@ namespace MiniFeladat
         }
 
         [WebMethod]
-        public static Product UpdateProduct(int id, string name, float price, int stockQuantity, string description, string category, bool isAvailable)
+        public static object UpdateProduct(int id, string name, float price, int stockQuantity, string description, string category, bool isAvailable)
         {
-            Product updatedProduct = new Product(id, name, price, stockQuantity, description, category, isAvailable);
-            productService.Update(updatedProduct);
-            return updatedProduct;
+            try
+            {
+                Product updatedProduct = new Product(id, name, price, stockQuantity, description, category, isAvailable);
+                productService.Update(updatedProduct);
+                return new { success = true, data = updatedProduct };
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return new { success = false, message = ex.Message };
+            }
         }
 
         [WebMethod]
-        public static Product AddProduct(string name, float price, int stockQuantity, string description, string category, bool isAvailable)
+        public static object AddProduct(string name, float price, int stockQuantity, string description, string category, bool isAvailable)
         {
-            Product newProduct = new Product(name, price, stockQuantity, description, category, isAvailable);
-            productService.Add(newProduct);
-            return newProduct;
+            try
+            {
+                Product newProduct = new Product(name, price, stockQuantity, description, category, isAvailable);
+                productService.Add(newProduct);
+                return new { success = true, data = newProduct };
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return new { success = false, message = ex.Message };
+            }
+
         }
 
     }
