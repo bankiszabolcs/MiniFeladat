@@ -7,17 +7,12 @@
     <title>Mini feladat</title>
     <link href="Content/bootstrap.min.css" rel="stylesheet" />
     <link href="Content/font-awesome.min.css" rel="stylesheet" />
-
 </head>
 <body>
     <form id="form1" runat="server">
-        <asp:ScriptManager ID="ScriptManager1" runat="server" EnablePageMethods="true"></asp:ScriptManager>
-        <asp:HiddenField ID="hfProductId" runat="server" />
-        <asp:HiddenField ID="hfProductName" runat="server" />
-        <asp:HiddenField ID="hfProductPrice" runat="server" />
-        <asp:HiddenField ID="hfProductStockQuantity" runat="server" />
-        <asp:HiddenField ID="hfProductDescription" runat="server" />
-        <asp:HiddenField ID="hfProductCategory" runat="server" />
+        <asp:ScriptManager ID="ScriptManager1" runat="server" EnablePageMethods="true">
+        </asp:ScriptManager>
+        <asp:HiddenField ID="hfProductId" runat="server" ClientIDMode="Static"/>
         <nav class="navbar navbar-expand-lg bg-body-tertiary">
             <div class="container-fluid">
                 <a class="navbar-brand" href="#">MiniFeladat</a>
@@ -203,7 +198,7 @@
 
         <script>
 
-            function showDeleteModal(productId, productName) {
+          <%--  function showDeleteModal(productId, productName) {
                 document.getElementById('<%= hfProductId.ClientID %>').value = productId
                 document.querySelector('.modal-body').innerHTML = `Biztos vagy benne, hogy törlöd <strong>${productName}</strong>?`
 
@@ -316,30 +311,6 @@
                 openToast("Sikertelen mentés.", "red")
             }
 
-            function openToast(text, color) {
-                
-                let toastEl = document.querySelector('.toast');
-                let toastBody = toastEl.querySelector('.toast-body')
-
-                toastBody.innerText = text;
-
-                if (color === "red") {
-                    toastEl.classList.add('bg-danger')
-                    toastEl.classList.remove('bg-success')
-                } else if (color === "green") {
-                    toastEl.classList.remove('bg-danger')
-                    toastEl.classList.add('bg-success')
-                }
-
-                let toast = new bootstrap.Toast(toastEl);
-                
-                toast.show();
-
-                setTimeout(function () {
-                    toast.hide();
-                }, 2000);
-            }
-
             const checkNegativeOrNot = function () {
                 var inputField = this.value;
                 var min = 0;
@@ -396,11 +367,12 @@
             document.querySelector('#editProductStockQuantity').addEventListener('input', checkNegativeOrNot)
             document.querySelector('#editProductName').addEventListener('input', checkTheName)
             document.querySelector('#editProductDescription').addEventListener('input', checkTheDescription)
-            document.querySelector('#editProductCategory').addEventListener('click', checkTheCategory)
-
+            document.querySelector('#editProductCategory').addEventListener('click', checkTheCategory)--%>
         </script>
     </form>
+        <script src="Scripts/js/utils.js" type="text/javascript"></script>
+    <script src="Scripts/js/product.js" type="text/javascript"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
-    <script src="Scripts/bootstrap.min.js"></script>
+    <script src="Scripts/Bootstrap/bootstrap.min.js"></script>
 </body>
 </html>
